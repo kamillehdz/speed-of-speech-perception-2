@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verbal Transformation Effect Experiment</title>
+  <style>
+    :root {
+      --bg: #82c5e4;
+      --text: #111;
+      --accent: #01366f;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Trebuchet MS', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      overflow: auto;
+    }
+    #progressBarContainer {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 200px;
+        height: 20px;
+        background: #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        display: block;
+    }
+    #progressBar {
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+    }
+    section {
+      text-align: center;
+      max-width: 800px;
+      padding: 40px;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    #introScreen {flex-direction: column; align-items: center;}
+    #introScreen.active {display: flex;}
+    #introScreen h1 {font-weight: bold; margin-top: 60px;}
+    #introScreen p {max-width: 600px; line-height: 1.6;}
+    video, audio {
+      width: 800px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 6px 12px;
+      font-size: 1rem;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {background-color: #c9dff8; color: black;}
+
+    .loopProgressContainer {
+      width: 80%;
+      height: 10px;
+      background: #ddd;
+      margin: 10px auto;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    
+    .loopProgressBar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.2s linear;
+    }
+
+    .key-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.key-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  background-color: #eee;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.key-box.active {
+  background-color: #4caf50;
+  color: white;
+  transform: scale(1.1);
+}
+  </style>
+</head>
+
+<body>
+<!-- INTRO PAGE -->
+<section id="introScreen" class="active">
+  <h1>Welcome to the Experiment</h1>
+  <p>This experiment will measure how you perceive repeated ambiguous speech.</p>
+  <p>Press <strong>D</strong> if you hear “farewell” and <strong>K</strong> if you hear “welfare.”  
+  Each time your perception switches, press the appropriate key again.</p>
+  <button onclick="showSection('volumeCheckScreen')">Click to proceed to the next page</button>
+</section>
+
+<!-- VOLUME CHECK -->
+<section id="volumeCheckScreen">
+  <h2>Volume Check</h2>
+  <p>Please ensure your volume is at a comfortable level.</p>
+  <audio id="volumeCheckAudio" controls>
+    <source src="volume_check.mp3" type="audio/mp3">
+  </audio>
+  <button onclick="showSection('exampleVideoScreen')">Click to proceed to the next page</button>
+</section>
+
+<!-- EXAMPLE VIDEO -->
+<section id="exampleVideoScreen">
+  <h2>Example Video</h2>
+  <video autoplay playsinline controls>
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/example_video.mp4" type="video/mp4">
+  </video>
+  <button onclick="showSection('trial1')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 1 — Audio: Farewell only -->
+<section id="trial1">
+  <h2>Trial 1</h2>
+  <div class="key-indicator">
+    <div id="keyD1" class="key-box">D</div>
+    <div id="keyK1" class="key-box">K</div>
+  </div>
+  <video id="vid1" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video1.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress1"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial2')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 2 — Farewell AV -->
+<section id="trial2">
+  <h2>Trial 2</h2>
+  <div class="key-indicator">
+    <div id="keyD2" class="key-box">D</div>
+    <div id="keyK2" class="key-box">K</div>
+  </div>
+  <video id="vid2" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video2.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress2"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial3')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 3 — Farewell + Wave -->
+<section id="trial3">
+  <h2>Trial 3</h2>
+  <div class="key-indicator">
+    <div id="keyD3" class="key-box">D</div>
+    <div id="keyK3" class="key-box">K</div>
+  </div>
+  <video id="vid3" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video3.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress3"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial4')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 4 — Welfare + Wave -->
+<section id="trial4">
+  <h2>Trial 4</h2>
+  <div class="key-indicator">
+    <div id="keyD4" class="key-box">D</div>
+    <div id="keyK4" class="key-box">K</div>
+  </div>
+  <video id="vid4" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video4.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress4"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial5')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 5 — Farewell + Nod -->
+<section id="trial5">
+  <h2>Trial 5</h2>
+  <div class="key-indicator">
+    <div id="keyD5" class="key-box">D</div>
+    <div id="keyK5" class="key-box">K</div>
+  </div>
+  <video id="vid5" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video5.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress5"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial6')">Continue to Experiment</button>
+</section>
+
+<!-- TRIAL 6 — Welfare + Nod -->
+<section id="trial6">
+  <h2>Trial 6</h2>
+  <div class="key-indicator">
+    <div id="keyD6" class="key-box">D</div>
+    <div id="keyK6" class="key-box">K</div>
+  </div>
+  <video id="vid6" autoplay playsinline preload="auto">
+    <source src="https://raw.githubusercontent.com/kamillehdz/speed-of-speech-perception/main/video6.mp4" type="video/mp4">
+  </video>
+  <div class="loopProgressContainer"><div class="loopProgressBar" id="progress5"></div></div>
+  <p>Press <strong>D</strong> for “farewell” and <strong>K</strong> for “welfare.”</p>
+  <button onclick="showSection('trial6')">Finish Experiment</button>
+</section>
+
+<!-- THANK YOU PAGE -->
+<section id="thankYouMessage">
+  <h2>Thank you for participating!</h2>
+  <p>Your responses have been recorded. You may now close this tab.</p>
+</section>
+
+<script>
+const TEST_MODE = false; // set to false to log data live
+const API_URL = "https://sheetdb.io/api/v1/tar154b79cjl1";
+const MAX_LOOPS = 100;
+const trialLoopCounts = {};
+
+// Mapping each section to condition label for “trial” column
+const trialLabels = {
+  trial1: "Audio only (Farewell)",
+  trial2: "AV Farewell",
+  trial3: "Farewell + Wave",
+  trial4: "Welfare + Wave",
+};
+
+// -------- Video Looping --------
+function autoLoopVideo(videoId, nextSectionId, progressId) {
+  const vid = document.getElementById(videoId);
+  const bar = document.getElementById(progressId);
+  if (!(videoId in trialLoopCounts)) trialLoopCounts[videoId] = 0;
+  vid.onended = null;
+  vid.play().catch(() => console.log("Autoplay requires user interaction"));
+
+  vid.onended = () => {
+    trialLoopCounts[videoId]++;
+    const progress = (trialLoopCounts[videoId] / MAX_LOOPS) * 100;
+    bar.style.width = progress + "%";
+
+    if (trialLoopCounts[videoId] < MAX_LOOPS) {
+      vid.currentTime = 0;
+      vid.play();
+    } else {
+      console.log(`${videoId} completed ${MAX_LOOPS} loops`);
+      showSection(nextSectionId);
+    }
+  };
+}
+
+// -------- Key Press Handling --------
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+  if (!["d", "k"].includes(key)) return;
+
+  const activeSection = document.querySelector("section.active");
+  const activeVideo = activeSection ? activeSection.querySelector("video") : null;
+  if (!activeVideo) return;
+
+  // Visual feedback
+  const trialNum = activeSection.id.replace("trial", "");
+  flashKey(`key${key.toUpperCase()}${trialNum}`);
+
+  // Determine current trial info
+  const sectionId = activeSection.id;
+  const trialLabel = trialLabels[sectionId] || "Unknown condition";
+  const videoTime = activeVideo.currentTime.toFixed(2).padEnd(5,'0');
+  const currentLoop = trialLoopCounts[activeVideo.id] || 0;
+
+  // Timestamp
+  const now = new Date();
+  const estTime = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const formattedTime = `${estTime.toISOString()}`;
+
+  // Prepare data row
+  const entry = {
+    participantId: localStorage.getItem("participantId") || "P" + Math.floor(Math.random() * 1e6),
+    sectionId: sectionId,
+    trial: trialLabel,
+    keyPressed: key,
+    videoTime: videoTime,
+    loopNumber: currentLoop + 1,
+    timestampEST: formattedTime
+  };
+
+  console.log("Recorded:", entry);
+
+  if (!TEST_MODE) {
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: entry })
+    }).catch(err => console.error("Logging error:", err));
+  }
+});
+
+// -------- Section Switching --------
+function showSection(id) {
+  document.querySelectorAll("video").forEach(v => {
+    v.pause();
+    v.currentTime = 0;
+  });
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+
+// -------- Mutation Observer (start looping when section visible) --------
+const trialOrder = [
+  { id: "trial1", next: "trial2", vid: "vid1", bar: "progress1" },
+  { id: "trial2", next: "trial3", vid: "vid2", bar: "progress2" },
+  { id: "trial3", next: "trial4", vid: "vid3", bar: "progress3" },
+  { id: "trial4", next: "trial5", vid: "vid4", bar: "progress4" },
+  { id: "trial5", next: "trial6", vid: "vid5", bar: "progress5" },
+  { id: "trial6", next: "thankYouMessage", vid: "vid6", bar: "progress6" }
+];
+
+const observer = new MutationObserver(() => {
+  const active = document.querySelector("section.active");
+  const trial = trialOrder.find(t => t.id === active?.id);
+  if (trial) autoLoopVideo(trial.vid, trial.next, trial.bar);
+});
+observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+// -------- Participant ID --------
+if (!localStorage.getItem("participantId")) {
+  localStorage.setItem("participantId", crypto.randomUUID());
+}
+
+// -------- Flash Keys --------
+function flashKey(id) {
+  const key = document.getElementById(id);
+  if (!key) return;
+  key.classList.add("active");
+  setTimeout(() => key.classList.remove("active"), 200);
+}
+</script>
+</body>
+</html>
