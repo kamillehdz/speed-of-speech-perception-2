@@ -1,1 +1,1 @@
-# speed-of-speech-2
+# speed-of-speech-perception-2
